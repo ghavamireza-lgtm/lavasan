@@ -2,21 +2,28 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authClient } from "@/lib/auth-client";
 import { signUpSchema, type SignUpFormData } from "@/lib/validations/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<SignUpFormData>({
+  const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       name: "",
@@ -35,8 +42,8 @@ export default function RegisterPage() {
       name: data.name,
       email: data.email,
       password: data.password,
-      mobile: data.mobile, //  ← بعداً که فیلد رو به Better Auth اضافه کردیم
-    } as any); // مو
+      mobile: data.mobile,
+    } as any);
 
     setLoading(false);
 
@@ -48,88 +55,112 @@ export default function RegisterPage() {
   }
 
   return (
-    <div style={{ maxWidth: 400, margin: "50px auto", padding: 20 }}>
-      <h1>ثبت‌نام</h1>
-      <form onSubmit={handleSubmit(formSubmit)}>
-        <div style={{ marginBottom: 12 }}>
-          <label>نام و نام خانوادگی</label>
-          <input
-            type="text"
-            {...register("name")}
-            style={{ width: "100%", padding: 8 }}
-          />
-          {errors.name && (
-            <p style={{ color: "red", fontSize: 12 }}>{errors.name.message}</p>
-          )}
-        </div>
+    <div className="space-y-6">
+      <div className="space-y-2 text-center">
+        <h1 className="text-2xl font-bold">ثبت‌نام</h1>
+        <p className="text-sm text-muted-foreground">
+          برای انتشار آگهی، ابتدا ثبت‌نام کنید
+        </p>
+      </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <label>ایمیل</label>
-          <input
-            type="email"
-            dir="ltr"
-            {...register("email")}
-            style={{ width: "100%", padding: 8 }}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(formSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>نام و نام خانوادگی</FormLabel>
+                <FormControl>
+                  <Input placeholder="مثلاً علی رضایی" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          {errors.email && (
-            <p style={{ color: "red", fontSize: 12 }}>{errors.email.message}</p>
-          )}
-        </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <label>رمز عبور</label>
-          <input
-            type="password"
-            dir="ltr"
-            {...register("password")}
-            style={{ width: "100%", padding: 8 }}
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>ایمیل</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    dir="ltr"
+                    placeholder="you@example.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          {errors.password && (
-            <p style={{ color: "red", fontSize: 12 }}>
-              {errors.password.message}
-            </p>
-          )}
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>تکرار رمز عبور</label>
-          <input
-            type="password"
-            dir="ltr"
-            {...register("confirmPassword")}
-            style={{ width: "100%", padding: 8 }}
+
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>رمز عبور</FormLabel>
+                <FormControl>
+                  <Input type="password" dir="ltr" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          {errors.confirmPassword && (
-            <p style={{ color: "red", fontSize: 12 }}>
-              {errors.confirmPassword.message}
-            </p>
-          )}
-        </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <label>شماره موبایل</label>
-          <input
-            type="text"
-            dir="ltr"
-            {...register("mobile")}
-            style={{ width: "100%", padding: 8 }}
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>تکرار رمز عبور</FormLabel>
+                <FormControl>
+                  <Input type="password" dir="ltr" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          {errors.mobile && (
-            <p style={{ color: "red", fontSize: 12 }}>
-              {errors.mobile.message}
-            </p>
+
+          <FormField
+            control={form.control}
+            name="mobile"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>شماره موبایل</FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    dir="ltr"
+                    placeholder="09123456789"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {serverError && (
+            <p className="text-sm text-destructive">{serverError}</p>
           )}
-        </div>
 
-        {serverError && <p style={{ color: "red" }}>{serverError}</p>}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "در حال ثبت..." : "ثبت‌نام"}
+          </Button>
+        </form>
+      </Form>
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{ width: "100%", padding: 10 }}
-        >
-          {loading ? "در حال ثبت..." : "ثبت‌نام"}
-        </button>
-      </form>
+      <p className="text-center text-sm text-muted-foreground">
+        قبلاً ثبت‌نام کرده‌اید؟{" "}
+        <Link href="/sign-in" className="text-primary hover:underline">
+          ورود
+        </Link>
+      </p>
     </div>
   );
 }
