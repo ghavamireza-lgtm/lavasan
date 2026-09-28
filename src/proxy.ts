@@ -1,23 +1,27 @@
 // src/proxy.ts
 import { NextRequest, NextResponse } from "next/server";
-import { headers } from "next/headers";
-import { getAuth } from "@/lib/auth";
+import { getSessionCookie } from "better-auth/cookies";
 
-export async function proxy(request: NextRequest) {
-  const auth = await getAuth();
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+export function proxy(request: NextRequest) {
+  const sessionCookie = getSessionCookie(request);
+  const isDashboard = request.nextUrl.pathname.startsWith("/dashboard");
 
-  const isProtected = request.nextUrl.pathname.startsWith("/dashboard");
 
-  if (isProtected && !session) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  if (isDashboard && !sessionCookie) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+
+  const isAuthPage = 
+  request.nextUrl.pathname === "/sign-in" ||
+  request.nextUrl.pathname === "/sign-up";
+
+  if (isAuthPage && sessionCookie) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/sign-in", "/sign-up"],
 };
