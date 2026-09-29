@@ -51,5 +51,20 @@ export function useListings() {
     fetchListings();
   }, [fetchListings]);
 
-  return { listings, isLoading, error, refetch: fetchListings };
+  // 👇 تابع publish
+  const publishListing = useCallback(
+    async (id: string) => {
+      const res = await fetch(`/api/listings/${id}/publish`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "خطا در انتشار آگهی");
+      }
+      await fetchListings();
+    },
+    [fetchListings]
+  );
+
+  return { listings, isLoading, error, refetch: fetchListings, publishListing };
 }

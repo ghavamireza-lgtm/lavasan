@@ -17,13 +17,21 @@ import { useListings, type Listing } from "@/hooks/use-listings";
 import { useSubscriptionUsage } from "@/hooks/use-subscription-usage";
 
 export default function ListingsPage() {
-  const { listings, isLoading, error, refetch } = useListings();
+  const { listings, isLoading, error, refetch, publishListing } = useListings();
   const {
     usage,
     isLoading: usageLoading,
     refetch: refetchUsage,
   } = useSubscriptionUsage();
   const [deleteTarget, setDeleteTarget] = useState<Listing | null>(null);
+
+  async function handlePublish(listing: Listing) {
+    try {
+      await publishListing(listing._id);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "خطا در انتشار");
+    }
+  }
 
   async function handleDeleteSuccess() {
     await Promise.all([refetch(), refetchUsage()]);
@@ -154,6 +162,7 @@ export default function ListingsPage() {
               key={listing._id}
               listing={listing}
               onDelete={(l) => setDeleteTarget(l)}
+              onPublish={handlePublish}
             />
           ))}
         </div>

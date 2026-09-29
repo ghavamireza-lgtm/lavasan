@@ -2,13 +2,15 @@
 'use client';
 
 import { useRouter } from "next/navigation";
-import { MapPin, Phone, Eye, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { MapPin, Phone, Eye, MoreVertical, Pencil, Trash2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ListingStatusBadge } from "./listing-status-badge";
@@ -17,9 +19,10 @@ import type { Listing } from "@/hooks/use-listings";
 type Props = {
   listing: Listing;
   onDelete?: (listing: Listing) => void;
+  onPublish?: (Listing: Listing) => void;
 };
 
-export function ListingCard({ listing, onDelete }: Props) {
+export function ListingCard({ listing, onDelete, onPublish }: Props) {
   const router = useRouter();
   const createdDate = new Date(listing.createdAt).toLocaleDateString("fa-IR");
 
@@ -27,7 +30,12 @@ export function ListingCard({ listing, onDelete }: Props) {
     <Card>
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            {listing.featured && (
+              <Badge className="bg-amber-500 text-white">
+                ویژه
+              </Badge>
+            )}
             <h3 className="font-semibold truncate">{listing.title}</h3>
             <ListingStatusBadge status={listing.status} />
           </div>
@@ -43,6 +51,15 @@ export function ListingCard({ listing, onDelete }: Props) {
             <MoreVertical className="h-4 w-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            {listing.status === "draft" && onPublish && (
+              <>
+                <DropdownMenuItem onClick={() => onPublish(listing)}>
+                  <Send className="h-4 w-4 me-2" />
+                  انتشار
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
             <DropdownMenuItem
               onClick={() =>
                 router.push(`/dashboard/listings/${listing._id}/edit`)
