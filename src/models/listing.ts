@@ -13,7 +13,7 @@ export interface IListing extends Document {
     city: string;
     province: string;
     logo?: string;
-    images: string[];
+    images?: string[];
     userId: string;
     status: ListingStatus;
     views: number;

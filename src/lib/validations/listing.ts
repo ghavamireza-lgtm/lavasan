@@ -36,7 +36,8 @@ export const listingSchema = z.object({
   city: z.string().min(2, "شهر الزامی است"),
   province: z.string().min(2, "استان الزامی است"),
   logo: z.string().optional(),
-  images: z.array(z.string()),  // 👈 .default([]) حذف شد
+  images: z.array(z.string()).optional().default([]),
+  featured: z.boolean().optional().default(false),
 });
 
 export type ListingFormData = z.infer<typeof listingSchema>;

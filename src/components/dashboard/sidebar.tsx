@@ -1,14 +1,8 @@
-// src/components/dashboard/sidebar.tsx
-"use client";
+'use client';
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  ListChecks,
-  User,
-  CreditCard,
-} from "lucide-react";
+import { LayoutDashboard, ListChecks, User, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
@@ -23,14 +17,14 @@ const menuItems = [
     icon: ListChecks,
   },
   {
-    title: "پروفایل",
-    href: "/dashboard/profile",
-    icon: User,
-  },
-  {
     title: "پکیج‌ها",
     href: "/dashboard/plans",
     icon: CreditCard,
+  },
+  {
+    title: "پروفایل",
+    href: "/dashboard/profile",
+    icon: User,
   },
 ];
 
@@ -61,7 +55,7 @@ export function DashboardSidebar() {
                 "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
                 isActive
                   ? "bg-primary text-primary-foreground"
-                  : "hover:bg-muted"
+                  : "hover:bg-muted",
               )}
             >
               <Icon className="h-4 w-4" />

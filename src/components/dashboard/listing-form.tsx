@@ -5,13 +5,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Star } from "lucide-react";
 import { listingSchema, type ListingFormData } from "@/lib/validations/listing";
+import { useFeaturedUsage } from "@/hooks/use-featured-usage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -60,8 +65,10 @@ export function ListingForm({ listingId, defaultValues }: Props) {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { usage: featuredUsage } = useFeaturedUsage();
 
   const isEdit = Boolean(listingId);
+  const wasFeatured = defaultValues?.featured || false;
 
   const form = useForm<ListingFormData>({
     resolver: zodResolver(listingSchema) as any,
@@ -76,6 +83,7 @@ export function ListingForm({ listingId, defaultValues }: Props) {
       city: defaultValues?.city || "",
       province: defaultValues?.province || "",
       images: defaultValues?.images || [],
+      featured: wasFeatured,
     },
   });
 
@@ -104,9 +112,13 @@ export function ListingForm({ listingId, defaultValues }: Props) {
     router.refresh();
   }
 
+  // می‌تونه featured رو انتخاب کنه؟
+  const canUseFeatured = wasFeatured || (featuredUsage?.canFeature ?? false);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(formSubmit)} className="space-y-6">
+        {/* عنوان */}
         <FormField
           control={form.control}
           name="title"
@@ -121,6 +133,7 @@ export function ListingForm({ listingId, defaultValues }: Props) {
           )}
         />
 
+        {/* توضیحات */}
         <FormField
           control={form.control}
           name="description"
@@ -129,7 +142,7 @@ export function ListingForm({ listingId, defaultValues }: Props) {
               <FormLabel>توضیحات</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="توضیحات کامل..."
+                  placeholder="توضیحات کامل درباره کسب‌وکار خود بنویسید..."
                   rows={5}
                   {...field}
                 />
@@ -139,6 +152,7 @@ export function ListingForm({ listingId, defaultValues }: Props) {
           )}
         />
 
+        {/* دسته‌بندی */}
         <FormField
           control={form.control}
           name="category"
@@ -164,6 +178,7 @@ export function ListingForm({ listingId, defaultValues }: Props) {
           )}
         />
 
+        {/* استان و شهر */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -205,6 +220,7 @@ export function ListingForm({ listingId, defaultValues }: Props) {
           />
         </div>
 
+        {/* آدرس */}
         <FormField
           control={form.control}
           name="address"
@@ -219,6 +235,7 @@ export function ListingForm({ listingId, defaultValues }: Props) {
           )}
         />
 
+        {/* تماس */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormField
             control={form.control}
@@ -266,6 +283,36 @@ export function ListingForm({ listingId, defaultValues }: Props) {
             )}
           />
         </div>
+
+        {/* آگهی ویژه */}
+        {canUseFeatured && (
+          <FormField
+            control={form.control}
+            name="featured"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start gap-3 rounded-md border p-4 bg-amber-50/50 border-amber-200">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none flex-1">
+                  <FormLabel className="flex items-center gap-2 cursor-pointer flex-wrap">
+                    <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+                    آگهی ویژه
+                    <Badge variant="secondary" className="text-xs">
+                      {featuredUsage?.remaining ?? 0} ظرفیت باقی‌مانده
+                    </Badge>
+                  </FormLabel>
+                  <FormDescription>
+                    آگهی ویژه در بالای نتایج نمایش داده می‌شود
+                  </FormDescription>
+                </div>
+              </FormItem>
+            )}
+          />
+        )}
 
         {serverError && (
           <p className="text-sm text-destructive">{serverError}</p>
