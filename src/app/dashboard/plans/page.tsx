@@ -42,6 +42,7 @@ export default function PlansPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [activating, setActivating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [buying, setBuying] = useState<string | null>(null);
 
   async function fetchData() {
     try {
@@ -87,18 +88,33 @@ export default function PlansPage() {
     router.refresh();
   }
 
-  function handleBuy(planName: string) {
-    alert(`خرید پکیج "${planName}" به‌زودی فعال می‌شود`);
-  }
+async function handleBuy(plan: Plan) {
+  // پکیج رایگان نباید به اینجا برسه چون دکمه‌اش جداست
+  setError(null);
+  setBuying(plan._id);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
+  try {
+    const res = await fetch("/api/payment/request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ planId: plan._id }),
+    });
 
+    const data = await res.json();
+console.log(data);
+    if (!res.ok) {
+      setError(data.error || "خطا در ایجاد تراکنش پرداخت");
+      setBuying(null);
+      return;
+    }
+
+    // هدایت کاربر به درگاه بانکی
+    window.location.href = data.paymentUrl;
+  } catch (err) {
+    setError("خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.");
+    setBuying(null);
+  }
+}
   const currentPlanSlug = subscription?.planSlug;
   const expiresDate = subscription
     ? new Date(subscription.expiresAt).toLocaleDateString("fa-IR")
@@ -199,7 +215,7 @@ export default function PlansPage() {
                       ? undefined
                       : isFree
                         ? handleActivateFree
-                        : () => handleBuy(plan.name)
+                        : () => handleBuy(plan)
                   }
                 >
                   {isCurrent
