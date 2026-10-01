@@ -1,8 +1,16 @@
 // src/components/dashboard/listing-card.tsx
-'use client';
+"use client";
 
 import { useRouter } from "next/navigation";
-import { MapPin, Phone, Eye, MoreVertical, Pencil, Trash2, Send } from "lucide-react";
+import {
+  MapPin,
+  Phone,
+  Eye,
+  MoreVertical,
+  Pencil,
+  Trash2,
+  Send,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,13 +36,20 @@ export function ListingCard({ listing, onDelete, onPublish }: Props) {
 
   return (
     <Card>
+      {listing.images && listing.images.length > 0 && (
+        <div className="w-full h-40 bg-muted overflow-hidden rounded-t-lg">
+          <img
+            src={listing.images[0]}
+            alt={listing.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             {listing.featured && (
-              <Badge className="bg-amber-500 text-white">
-                ویژه
-              </Badge>
+              <Badge className="bg-amber-500 text-white">ویژه</Badge>
             )}
             <h3 className="font-semibold truncate">{listing.title}</h3>
             <ListingStatusBadge status={listing.status} />

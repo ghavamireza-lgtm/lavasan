@@ -19,6 +19,7 @@ type Listing = {
   featured: boolean;
   views: number;
   createdAt: string;
+  images?: string[];
 };
 
 type Pagination = {

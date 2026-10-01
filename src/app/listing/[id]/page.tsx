@@ -15,12 +15,7 @@ import Listing from "@/models/listing";
 import { PublicHeader } from "@/components/public/public-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -51,11 +46,7 @@ export default async function ListingDetailPage({ params }: Params) {
 
       <main className="container mx-auto px-4 py-8 max-w-4xl space-y-6">
         {/* دکمه برگشت */}
-        <Button
-          variant="ghost"
-          nativeButton={false}
-          render={<Link href="/" />}
-        >
+        <Button variant="ghost" nativeButton={false} render={<Link href="/" />}>
           <ArrowRight className="h-4 w-4 me-2" />
           بازگشت به لیست
         </Button>
@@ -74,9 +65,7 @@ export default async function ListingDetailPage({ params }: Params) {
                   )}
                   <Badge variant="secondary">{listing.category}</Badge>
                 </div>
-                <CardTitle className="text-2xl mb-2">
-                  {listing.title}
-                </CardTitle>
+                <CardTitle className="text-2xl mb-2">{listing.title}</CardTitle>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <MapPin className="h-3 w-3" />
@@ -94,6 +83,19 @@ export default async function ListingDetailPage({ params }: Params) {
             </div>
           </CardHeader>
 
+          {listing.images && listing.images.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 px-6 pb-4">
+              {listing.images.map((url, idx) => (
+                <img
+                  key={idx}
+                  src={url}
+                  alt={`${listing.title} - ${idx + 1}`}
+                  className="w-full h-40 object-cover rounded-md border"
+                />
+              ))}
+            </div>
+          )}
+
           <CardContent className="space-y-6">
             {/* توضیحات */}
             <div>
@@ -106,9 +108,7 @@ export default async function ListingDetailPage({ params }: Params) {
             {/* آدرس */}
             <div>
               <h2 className="font-semibold mb-2">آدرس</h2>
-              <p className="text-sm text-muted-foreground">
-                {listing.address}
-              </p>
+              <p className="text-sm text-muted-foreground">{listing.address}</p>
             </div>
 
             {/* تماس */}
@@ -117,9 +117,7 @@ export default async function ListingDetailPage({ params }: Params) {
               <div className="flex flex-wrap gap-2">
                 <Button
                   nativeButton={false}
-                  render={
-                    <a href={`tel:${listing.phone}`} />
-                  }
+                  render={<a href={`tel:${listing.phone}`} />}
                 >
                   <Phone className="h-4 w-4 me-2" />
                   {listing.phone}

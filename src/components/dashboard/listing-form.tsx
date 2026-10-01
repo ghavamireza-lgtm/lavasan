@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { ImageUpload } from "./image-upload";
 import {
   Form,
   FormControl,
@@ -282,6 +283,29 @@ export function ListingForm({ listingId, defaultValues }: Props) {
               </FormItem>
             )}
           />
+
+          {/* تصاویر آگهی */}
+          <FormField
+            control={form.control}
+            name="images"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>تصاویر آگهی</FormLabel>
+                <FormControl>
+                  <ImageUpload
+                    value={field.value || []}
+                    onChange={field.onChange}
+                    maxFiles={5}
+                    folder={`listings/${listingId || "new"}`}
+                  />
+                </FormControl>
+                <FormDescription>
+                  حداکثر ۵ تصویر می‌توانید اضافه کنید
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         {/* آگهی ویژه */}
@@ -326,11 +350,7 @@ export function ListingForm({ listingId, defaultValues }: Props) {
                 ? "ذخیره تغییرات"
                 : "ذخیره پیش‌نویس"}
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
-          >
+          <Button type="button" variant="outline" onClick={() => router.back()}>
             انصراف
           </Button>
         </div>
